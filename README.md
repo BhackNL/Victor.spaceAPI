@@ -24,5 +24,6 @@ Don't enable slack integration when running on http (unencrypted)
 
 
 ## Enhance
-Open an issue and we might add your feature or fix defects 
+Open an issue and we might add your feature or fix defects.
+
 Fork and give back ;-)
