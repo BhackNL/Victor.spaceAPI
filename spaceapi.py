@@ -60,22 +60,21 @@ class SlackApi(Resource):
 	def post(self):
 		args = parser.parse_args()
 		if args['token'] == config.token:
-			if args['command'] == "spaceopen":
-				print "Open space" 
+			command=args['text'].split()[0]
+			if command == "open":
 				config.state=True
 				config.trigger_person=args['user_name']
 				config.lastchange=time.time() 
  				return { "text": "The space is now open", "username":"spaceapi"},200			
-			elif args['command'] == "spaceclose":
-				print "Close space" 
+			elif command == "close":
 				config.state=False
 				config.trigger_person=args['user_name']
 				config.lastchange=time.time() 
-				return { "text": "The space is now open", "username":"spaceapi"},200
+				return { "text": "The space is now closed", "username":"spaceapi"},200
 			else:
-				return {"text": "Unknown command, valid commmands are: spaceopen,spaceclose"},403
+				return {"text": "Unknown command, valid commmands are: open, close"},403
 		else:
-			return {"text": "Invalid token"},403
+			return {"text": "SpaceAPI, token mismatch"},403
 
 class IndexPage(Resource):
     def get(self):
