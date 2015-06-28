@@ -1,10 +1,16 @@
 from flask import Flask,jsonify
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from ConfigParser import SafeConfigParser
 import time
 
 app = Flask(__name__)
 api = Api(app)
+
+parser = reqparse.RequestParser()
+parser.add_argument('token', type=str)
+parser.add_argument('text', type=str)
+parser.add_argument('user_name', type=str)
+
 
 section_names = 'spaceapi', 'slack'
 class SpaceConfiguration(object):
