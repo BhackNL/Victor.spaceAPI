@@ -86,8 +86,12 @@ class IndexPage(Resource):
     def get(self):
         return {'space': 'bhack'}
 
+
 api.add_resource(IndexPage, '/')
-api.add_resource(SpaceApi, '/api')
+
+# Bhack legacy remove this asap
+api.add_resource(SpaceApi, '/SpaceApi') 
+
 api.add_resource(SpaceApi, '/api/space')
 api.add_resource(SlackApi, '/api/slack')
 
