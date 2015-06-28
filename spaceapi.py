@@ -1,0 +1,83 @@
+from flask import Flask,jsonify
+from flask_restful import Resource, Api
+from ConfigParser import SafeConfigParser
+import time
+
+app = Flask(__name__)
+api = Api(app)
+
+section_names = 'spaceapi', 'slack'
+class SpaceConfiguration(object):
+
+    def __init__(self, *file_names):
+        parser = SafeConfigParser()
+        parser.optionxform = str 
+        found = parser.read(file_names)
+        if not found:
+            raise ValueError('No config file found!')
+        for name in section_names:
+            self.__dict__.update(parser.items(name)) 
+			
+config = SpaceConfiguration('space.cfg')
+config.state=False
+config.lastchange=int(time.time())
+
+class SpaceApi(Resource):
+	"""Space Stub at first"""
+	
+	def __init__(self):
+		"""Check space config ?"""
+
+	def get(self):
+		"""Respond to GET, api version 0.13 compliant
+		Validate spaceapi json at http://spaceapi.net/validator
+		"""
+		data={}
+		data['api']=config.apiversion
+		data['space']=config.spacename
+		data['logo']=config.logo
+		data['url']=config.url
+		data['location']={"address":config.address,"lat": config.lat,"lon": config.lon}
+		data['state']={"open": config.state,"lastchange": config.lastchange,"trigger_person":config.trigger_person,"message": config.message}
+		data['contact']={"irc":config.irc,"twitter":config.twitter,"email":config.email}
+		data['issue_report_channels']=config.issue_report_channels.split(',')
+		data['feeds']={"blog": {"type":"rss","url":"http://bhack.nl/feed"}}
+		data['projects']=config.projects.split(',')
+		return jsonify(data)
+
+class SlackApi(Resource):
+	"""Slack outgoing webhooks integration"""
+	
+	def get(self):
+		return {}
+		
+	def post(self):
+		args = parser.parse_args()
+		if args['token'] == config.token:
+			if args['command'] == "spaceopen":
+				print "Open space" 
+				config.state=True
+				config.trigger_person=args['user_name']
+				config.lastchange=time.time() 
+ 				return { "text": "The space is now open", "username":"spaceapi"},200			
+			elif args['command'] == "spaceclose":
+				print "Close space" 
+				config.state=False
+				config.trigger_person=args['user_name']
+				config.lastchange=time.time() 
+				return { "text": "The space is now open", "username":"spaceapi"},200
+			else:
+				return {"text": "Unknown command, valid commmands are: spaceopen,spaceclose"},403
+		else:
+			return {"text": "Invalid token"},403
+
+class IndexPage(Resource):
+    def get(self):
+        return {'space': 'bhack'}
+
+api.add_resource(IndexPage, '/')
+api.add_resource(SpaceApi, '/api/space')
+api.add_resource(SlackApi, '/api/slack')
+
+if __name__ == '__main__':
+    app.run(debug=True,host='0.0.0.0')
