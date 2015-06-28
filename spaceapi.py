@@ -31,7 +31,7 @@ config.lastchange=int(time.time())
 
 def SlackWebhook(message,channel="#general"):
 	payload={"text": message,"channel": channel}
-	r = requests.post(config.slackwebhookurl.data=payload))
+	r = requests.post(config.slackwebhookurl,data=payload)
 	return r.text
 
 class SpaceApi(Resource):
