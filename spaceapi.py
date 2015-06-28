@@ -2,6 +2,7 @@ from flask import Flask,jsonify
 from flask_restful import Resource, Api, reqparse
 from ConfigParser import SafeConfigParser
 import time
+import requests
 
 app = Flask(__name__)
 api = Api(app)
@@ -28,6 +29,11 @@ config = SpaceConfiguration('space.cfg')
 config.state=False
 config.lastchange=int(time.time())
 
+def SlackWebhook(message,channel="#general"):
+	payload={"text": message,"channel": channel}
+	r = requests.post(config.slackwebhookurl.data=payload))
+	return r.text
+
 class SpaceApi(Resource):
 	"""Space Stub at first"""
 	
@@ -52,7 +58,7 @@ class SpaceApi(Resource):
 		return jsonify(data)
 
 class SlackApi(Resource):
-	"""Slack outgoing webhooks integration"""
+	"""Slack slash commands integration"""
 	
 	def get(self):
 		return {}
@@ -65,22 +71,23 @@ class SlackApi(Resource):
 				config.state=True
 				config.trigger_person=args['user_name']
 				config.lastchange=time.time() 
- 				return { "text": "The space is now open", "username":"spaceapi"},200			
+ 				return "The space is now open",200			
 			elif command == "close":
 				config.state=False
 				config.trigger_person=args['user_name']
 				config.lastchange=time.time() 
-				return { "text": "The space is now closed", "username":"spaceapi"},200
+				return "The space is now closed",200
 			else:
-				return {"text": "Unknown command, valid commmands are: open, close"},403
+				return "Unknown command, valid commmands are: open, close",403
 		else:
-			return {"text": "SpaceAPI, token mismatch"},403
+			return "SpaceAPI, token mismatch",403
 
 class IndexPage(Resource):
     def get(self):
         return {'space': 'bhack'}
 
 api.add_resource(IndexPage, '/')
+api.add_resource(SpaceApi, '/api')
 api.add_resource(SpaceApi, '/api/space')
 api.add_resource(SlackApi, '/api/slack')
 
