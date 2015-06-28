@@ -14,8 +14,10 @@ parser.add_argument('user_name', type=str)
 
 
 section_names = 'spaceapi', 'slack'
-class SpaceConfiguration(object):
-
+class Configuration(object):
+	"""
+	Configuration loader
+	"""
     def __init__(self, *file_names):
         parser = SafeConfigParser()
         parser.optionxform = str 
@@ -25,23 +27,33 @@ class SpaceConfiguration(object):
         for name in section_names:
             self.__dict__.update(parser.items(name)) 
 			
-config = SpaceConfiguration('space.cfg')
+config = Configuration('space.cfg')
 config.state=False
 config.lastchange=int(time.time())
 
+
 def SlackWebhook(message,channel="#general"):
+	"""
+	Slack webhook for callbacks to channel
+	
+	Configure a webhook in slack and set slack.webhookurl in the config
+	"""
 	payload={"text": message,"channel": channel}
-	r = requests.post(config.slackwebhookurl,data=payload)
+	r = requests.post(config.webhookurl,data=payload)
 	return r.text
 
+
 class SpaceApi(Resource):
-	"""Space Stub at first"""
+	"""
+	Space API endpoint
 	
-	def __init__(self):
-		"""Check space config ?"""
+	Implements api version 0.13, see http://spaceapi.net/
+	This is work in progress
+	"""
 
 	def get(self):
-		"""Respond to GET, api version 0.13 compliant
+		"""
+		Respond to GET, api version 0.13 compliant
 		Validate spaceapi json at http://spaceapi.net/validator
 		"""
 		data={}
@@ -53,12 +65,19 @@ class SpaceApi(Resource):
 		data['state']={"open": config.state,"lastchange": config.lastchange,"trigger_person":config.trigger_person,"message": config.message}
 		data['contact']={"irc":config.irc,"twitter":config.twitter,"email":config.email}
 		data['issue_report_channels']=config.issue_report_channels.split(',')
+		#TODO: work out ini to dictionary
 		data['feeds']={"blog": {"type":"rss","url":"http://bhack.nl/feed"}}
 		data['projects']=config.projects.split(',')
 		return jsonify(data)
 
+
 class SlackApi(Resource):
-	"""Slack slash commands integration"""
+	"""
+	Slack slash commands 
+	
+	Endpoint for  Slack Slash Commands integration
+	Configure this integration in slack en set token in de config.
+	"""
 	
 	def get(self):
 		return {}
@@ -84,15 +103,13 @@ class SlackApi(Resource):
 
 class IndexPage(Resource):
     def get(self):
-        return {'space': 'bhack'}
+        return {'page': 'notfound'}
 
 
 api.add_resource(IndexPage, '/')
 
-# Bhack legacy remove this asap
-api.add_resource(SpaceApi, '/SpaceApi') 
-
-api.add_resource(SpaceApi, '/api/space')
+# Bhack legacy change this asap
+api.add_resource(SpaceApi, '/SpaceApi')
 api.add_resource(SlackApi, '/api/slack')
 
 if __name__ == '__main__':
