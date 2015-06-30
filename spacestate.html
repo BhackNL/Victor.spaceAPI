@@ -1,0 +1,35 @@
+
+<!doctype html>
+<html>
+    <head>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                line-height: 1em;
+                border: 0;
+                color: #FFFFFF;
+            }
+        
+            body {
+                font-size: 16px;
+                font-family: monospace;
+                text-decoration: underline;
+                text-align: center;
+				{% if state %}
+                background-color: #20ff20;
+				{% else %}
+                background-color: #FF2020;
+				{% endif %}
+                padding-top: 7px;
+            }
+        </style>
+    </head>
+    <body>
+		{% if state %}
+        <a href="http://bhack.nl" target="_blank">Open</a>
+		{% else %}
+        <a href="http://bhack.nl" target="_blank">Nobody's home.</a>
+		{% endif %}
+    </body>
+</html>

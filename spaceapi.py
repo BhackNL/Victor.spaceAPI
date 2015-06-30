@@ -1,4 +1,4 @@
-from flask import Flask,jsonify
+from flask import Flask,jsonify, render_template
 from flask_restful import Resource, Api, reqparse
 from ConfigParser import SafeConfigParser
 import time
@@ -104,6 +104,10 @@ class SlackApi(Resource):
 class IndexPage(Resource):
     def get(self):
         return {'page': 'notfound'}
+
+@app.route('/SpaceStateWidget')
+def spacestatewidget():
+	return render_template('spacestate.html',state=config.state)
 
 
 api.add_resource(IndexPage, '/')
