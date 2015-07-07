@@ -20,13 +20,13 @@ class Configuration(object):
 	"""
 	def __init__(self, *file_names):
 		parser = SafeConfigParser()
-		parser.optionxform = str 
+		parser.optionxform = str
 		found = parser.read(file_names)
 		if not found:
 			raise ValueError('No config file found!')
 		for name in section_names:
-			self.__dict__.update(parser.items(name)) 
-			
+			self.__dict__.update(parser.items(name))
+
 config = Configuration('space.cfg')
 config.state=False
 config.lastchange=int(time.time())
@@ -35,7 +35,7 @@ config.lastchange=int(time.time())
 def SlackWebhook(message,channel="#general"):
 	"""
 	Slack webhook for callbacks to channel
-	
+
 	Configure a webhook in slack and set slack.webhookurl in the config
 	"""
 	payload={"text": message,"channel": channel}
@@ -46,7 +46,7 @@ def SlackWebhook(message,channel="#general"):
 class SpaceApi(Resource):
 	"""
 	Space API endpoint
-	
+
 	Implements api version 0.13, see http://spaceapi.net/
 	This is work in progress
 	"""
@@ -73,15 +73,15 @@ class SpaceApi(Resource):
 
 class SlackApi(Resource):
 	"""
-	Slack slash commands 
-	
+	Slack slash commands
+
 	Endpoint for  Slack Slash Commands integration
 	Configure this integration in slack en set token in de config.
 	"""
-	
+
 	def get(self):
 		return {}
-		
+
 	def post(self):
 		args = parser.parse_args()
 		if args['token'] == config.token:
@@ -89,12 +89,12 @@ class SlackApi(Resource):
 			if command == "open":
 				config.state=True
 				config.trigger_person=args['user_name']
-				config.lastchange=time.time() 
- 				return "The space is now open",200			
+				config.lastchange=time.time()
+ 				return "The space is now open",200
 			elif command == "close":
 				config.state=False
 				config.trigger_person=args['user_name']
-				config.lastchange=time.time() 
+				config.lastchange=time.time()
 				return "The space is now closed",200
 			else:
 				return "Unknown command, valid commmands are: open, close",403
@@ -105,7 +105,7 @@ class IndexPage(Resource):
     def get(self):
         return {'page': 'notfound'}
 
-@app.route('/SpaceStateWidget')
+@app.route('/SpacestateWidget')
 def spacestatewidget():
 	return render_template('spacestate.html',state=config.state)
 
