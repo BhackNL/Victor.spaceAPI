@@ -96,6 +96,12 @@ class SlackApi(Resource):
 				config.trigger_person=args['user_name']
 				config.lastchange=time.time()
 				return "The space is now closed",200
+			elif command == "state":
+				if config.state:
+					status="open"
+				else:
+					status="closed"
+				return "The space is "+status,200
 			else:
 				return "Unknown command, valid commmands are: open, close",403
 		else:
