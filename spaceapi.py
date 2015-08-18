@@ -101,9 +101,9 @@ class SlackApi(Resource):
 					status="open"
 				else:
 					status="closed"
-				return "The space is "+status,200
+				return "The space is "+status+"since "+time.strftime("%d %b, %H:%M",time.localtime(config.lastchange)),200
 			else:
-				return "Unknown command, valid commmands are: open, close",403
+				return "Unknown command, valid commmands are: open, close, state",403
 		else:
 			return "SpaceAPI, token mismatch",403
 
