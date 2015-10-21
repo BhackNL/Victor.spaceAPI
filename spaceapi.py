@@ -61,7 +61,7 @@ class SpaceApi(Resource):
 		data['space']=config.spacename
 		data['logo']=config.logo
 		data['url']=config.url
-		data['location']={"address":config.address,"lat": config.lat,"lon": config.lon}
+		data['location']={"address":config.address,"lat": float(config.lat),"lon": float(config.lon)}
 		data['state']={"open": config.state,"lastchange": config.lastchange,"trigger_person":config.trigger_person,"message": config.message}
 		data['contact']={"irc":config.irc,"twitter":config.twitter,"email":config.email}
 		data['issue_report_channels']=config.issue_report_channels.split(',')
